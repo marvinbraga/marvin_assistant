@@ -63,5 +63,5 @@ if __name__ == '__main__':
     from tts.eleven_labs.settings import Settings
 
     # Para criar seu arquivo de voices.
-    settings = Settings(name="Bella", filename="../../resources/voices.json")
-    print(ElevenLabsApi(settings=settings).list())
+    _settings = Settings(name="Bella", filename="../../resources/voices.json")
+    print(ElevenLabsApi(settings=_settings).list())
