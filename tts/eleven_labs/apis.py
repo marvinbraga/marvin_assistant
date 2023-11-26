@@ -65,3 +65,4 @@ if __name__ == '__main__':
     # Para criar seu arquivo de voices.
     _settings = Settings(name="Bella", filename="../../resources/voices.json")
     print(ElevenLabsApi(settings=_settings).list())
+
