@@ -16,7 +16,7 @@ class ElevenLabsApi:
     def get_audio(self, message):
         payload = {
             "text": message,
-            "model_id": "eleven_multilingual_v1",
+            "model_id": "eleven_multilingual_v2",
             "language": self._language,
             "voice_settings": {
                 "stability": self._stability,
