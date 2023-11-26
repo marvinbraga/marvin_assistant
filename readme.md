@@ -7,7 +7,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.65.2-green.svg)](https://fastapi.tiangolo.com/)
 [![Redis](https://img.shields.io/badge/Redis-6.2.5-red.svg)](https://redis.io/)
 [![LangChain](https://img.shields.io/badge/LangChain%20Framework-latest-blue.svg)](https://github.com/langchain-ai/langchain)
-[![OpenAI API](https://img.shields.io/badge/OpenAI%20API-latest-orange.svg)](https://beta.openai.com/)
+[![OpenAI API](https://img.shields.io/badge/OpenAI%20API-0.28.1-orange.svg)](https://beta.openai.com/)
 
 ## Description
 
