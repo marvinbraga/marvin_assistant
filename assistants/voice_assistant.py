@@ -16,12 +16,13 @@ class VoiceAssistant:
     BASE_COLOR = (64, 64, 64)
     RECORDING_COLOR = (144, 238, 144)
 
-    def __init__(self, audio_recorder):
+    def __init__(self, audio_recorder, audio_loader):
         pygame.init()
         self.screen = pygame.display.set_mode((640, 480))
         pygame.display.set_caption("Assistente de Voz")
         self.chat_ui = ChatUI(self.screen)
         self.audio_recorder = audio_recorder
+        self.audio_loader = audio_loader
         self.running = True
         self.is_recording = False
 
@@ -58,9 +59,9 @@ class VoiceAssistant:
     def send_command(self):
         # Transformando áudio em texto.
         file_path = os.path.dirname(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
-        docs = AudioTranscript(
-            audio_filename=file_path
-        ).execute().docs
+        docs = AudioTranscript(loader=self.audio_loader).execute().docs
+        # Apresenta mensagem transcrita.
         self.chat_ui.add_message("".join([d.page_content for d in docs]))
+        # Remove o arquivo temporário do comando de voz.
         os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
         return self
