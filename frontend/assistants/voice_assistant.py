@@ -2,11 +2,11 @@ import os.path
 
 import pygame
 
-from assistants.events import SEND_COMMAND_MESSAGE_EVENT, send_command_event, READ_CONTENT_MESSAGE_EVENT
-from audio.audio_to_text import AudioTranscript
-from audio.players import AudioPlayer
-from chats.basic_ui import ChatUI
-from tts.eleven_labs.producers import VoiceProducer
+from frontend.assistants.events import SEND_COMMAND_MESSAGE_EVENT, send_command_event, READ_CONTENT_MESSAGE_EVENT
+from frontend.audio.audio_to_text import AudioTranscript
+from frontend.audio.players import AudioPlayer
+from frontend.chats.basic_ui import ChatUI
+from frontend.tts.eleven_labs.producers import VoiceProducer
 
 
 class VoiceAssistant:
@@ -45,7 +45,7 @@ class VoiceAssistant:
                 self.send_command()
             elif event.type == READ_CONTENT_MESSAGE_EVENT:
                 content = event.content
-                self.read_content(content)
+                # self.read_content(content)
 
     def start_recording(self):
         self.is_recording = self.audio_recorder.start().is_recording
@@ -62,12 +62,19 @@ class VoiceAssistant:
         docs = AudioTranscript(loader=self.audio_loader).execute().docs
         command = "".join([d.page_content for d in docs])
         # Apresenta mensagem transcrita.
-        self.chat_ui.add_message(f'User: {command}')
+        self.chat_ui.add_message(f"User: {command}")
         # Remove o arquivo temporário do comando de voz.
         os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
 
+        # TODO: Enviar o comando para a API do Chat.
+        # TODO: A API do Chat chamará a API do RAG, que retornará uma resposta em texto.
+        # TODO: Recupera a resposta em texto e utiliza a função send_read(content=content)
+        content = command
+
+        # Imprime a resposta da API do RAG.
+        self.chat_ui.add_message(f"Assistant: {content}")
         # Chama a execução da leitura da resposta.
-        self.send_read(content=command)
+        self.send_read(content=content)
         return self
 
     def send_read(self, content):

@@ -1,4 +1,4 @@
-from audio.abstract_loaders import AbstractAudioLoader
+from frontend.audio.abstract_loaders import AbstractAudioLoader
 
 
 class M4aAudioLoader(AbstractAudioLoader):

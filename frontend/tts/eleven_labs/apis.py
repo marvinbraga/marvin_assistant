@@ -60,9 +60,9 @@ class ElevenLabsApi:
 
 
 if __name__ == '__main__':
-    from tts.eleven_labs.settings import Settings
+    from frontend.tts.eleven_labs.settings import Settings
 
     # Para criar seu arquivo de voices.
-    _settings = Settings(name="Bella", filename="../../resources/voices.json")
+    _settings = Settings(name="Bella", filename="../../frontend/resources/voices.json")
     print(ElevenLabsApi(settings=_settings).list())
 
