@@ -18,7 +18,7 @@ class Mp3Recorder(AbstractAudioRecorder):
                 wf.writeframes(b''.join(self._frames))
 
             sound = AudioSegment.from_wav(temp_filename)
-            sound.export(self.COMMAND_OUTPUT_FILENAME, format="mp3")
+            sound.export(os.path.normpath(self.COMMAND_OUTPUT_FILENAME), format="mp3")
         finally:
             os.remove(temp_filename)
         return self

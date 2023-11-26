@@ -18,7 +18,7 @@ class M4aRecorder(AbstractAudioRecorder):
                 wf.writeframes(b''.join(self._frames))
 
             sound = AudioSegment.from_wav(temp_filename)
-            sound.export(self.COMMAND_OUTPUT_FILENAME, format="mp4", codec="aac")
+            sound.export(os.path.normpath(self.COMMAND_OUTPUT_FILENAME), format="mp4", codec="aac")
         finally:
             os.remove(temp_filename)
         return self

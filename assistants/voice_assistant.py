@@ -58,10 +58,9 @@ class VoiceAssistant:
 
     def send_command(self):
         # Transformando áudio em texto.
-        file_path = os.path.dirname(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
         docs = AudioTranscript(loader=self.audio_loader).execute().docs
         # Apresenta mensagem transcrita.
-        self.chat_ui.add_message("".join([d.page_content for d in docs]))
+        self.chat_ui.add_message(f'User: {"".join([d.page_content for d in docs])}')
         # Remove o arquivo temporário do comando de voz.
         os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
         return self
