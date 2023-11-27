@@ -3,20 +3,27 @@ name = "marvin-assistant"
 version = "0.1.0"
 description = ""
 authors = ["Marcus Vinicus Braga <mvbraga@gmail.com>"]
-readme = "README.md"
+readme = "readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pygame = "^2.5.2"
-pyaudio = "^0.2.14"
 pydub = "^0.25.1"
 lameenc = "^1.6.3"
 python-dotenv = "^1.0.0"
 openai = "0.28.1"
 langchain = "^0.0.340"
 requests = "^2.31.0"
-playsound = "^1.3.0"
-
+fastapi = "^0.104.1"
+psycopg2-binary = "^2.9.9"
+tiktoken = "^0.5.1"
+pgvector = "^0.2.3"
+uvicorn = "^0.24.0.post1"
+pyodbc = "^5.0.1"
+redis = "^5.0.1"
+pypdf = "^3.17.1"
+jq = "^1.6.0"
+invoke = "^2.2.0"
 
 [build-system]
 requires = ["poetry-core"]
