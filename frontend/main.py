@@ -13,7 +13,7 @@ def main():
     recorder = M4aRecorder()
     save_dir = os.path.dirname(recorder.COMMAND_OUTPUT_FILENAME)
     # Áudio TTS API.
-    tts_api = ElevenLabsApi(settings=Settings(name="Bella", filename="frontend/resources/voices.json"))
+    tts_api = ElevenLabsApi(settings=Settings(name="Bella", filename="resources/voices.json"))
     # Inicializando o assistente.
     assistant = VoiceAssistant(
         audio_recorder=AudioRecorder(recorder=recorder),

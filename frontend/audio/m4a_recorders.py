@@ -6,10 +6,10 @@ import wave
 
 
 class M4aRecorder(AbstractAudioRecorder):
-    COMMAND_OUTPUT_FILENAME = "frontend/resources/command.m4a"
+    COMMAND_OUTPUT_FILENAME = "resources/command.m4a"
 
     def _save(self):
-        temp_filename = os.path.normpath("frontend/resources/temp.wav")
+        temp_filename = os.path.normpath("resources/temp.wav")
         try:
             with wave.open(temp_filename, 'wb') as wf:
                 wf.setnchannels(self._channels)

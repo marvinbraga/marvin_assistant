@@ -6,7 +6,11 @@ from frontend.assistants.events import SEND_COMMAND_MESSAGE_EVENT, send_command_
 from frontend.audio.audio_to_text import AudioTranscript
 from frontend.audio.players import AudioPlayer
 from frontend.chats.basic_ui import ChatUI
+from frontend.services.chat_api import ChatApi
 from frontend.tts.eleven_labs.producers import VoiceProducer
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 
 class VoiceAssistant:
@@ -58,24 +62,44 @@ class VoiceAssistant:
         return self
 
     def send_command(self):
-        # Transformando áudio em texto.
-        docs = AudioTranscript(loader=self.audio_loader).execute().docs
-        command = "".join([d.page_content for d in docs])
-        # Apresenta mensagem transcrita.
-        self.chat_ui.add_message(f"User: {command}")
-        # Remove o arquivo temporário do comando de voz.
-        os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
+        command = self._transcribe_audio()
+        self._display_transcribed_message(command)
+        self._remove_audio_file()
 
-        # TODO: Enviar o comando para a API do Chat.
-        # TODO: A API do Chat chamará a API do RAG, que retornará uma resposta em texto.
-        # TODO: Recupera a resposta em texto e utiliza a função send_read(content=content)
-        content = command
+        response = self._send_message_to_chat(command)
+        assistant_response = self._extract_response_message(response)
+        self._display_assistant_message(assistant_response)
 
-        # Imprime a resposta da API do RAG.
-        self.chat_ui.add_message(f"Assistant: {content}")
-        # Chama a execução da leitura da resposta.
-        self.send_read(content=content)
+        self.send_read(content=assistant_response)
         return self
+
+    def _transcribe_audio(self):
+        docs = AudioTranscript(loader=self.audio_loader).execute().docs
+        return "".join([doc.page_content for doc in docs])
+
+    def _display_transcribed_message(self, message):
+        self.chat_ui.add_message(f"User: {message}")
+
+    def _remove_audio_file(self):
+        try:
+            os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
+        except OSError as e:
+            print(f"Error: {e.strerror}")
+
+    @staticmethod
+    def _send_message_to_chat(message):
+        chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
+        return chat_api.post(user_id="marcus", conversation_id="01", message=message)
+
+    @staticmethod
+    def _extract_response_message(response):
+        conversation = response.get("conversation", {})
+        messages = conversation.get("messages", [])
+        msg = messages[-1].get("content") if messages else "No response received"
+        return msg
+
+    def _display_assistant_message(self, message):
+        self.chat_ui.add_message(f"Assistant: {message}")
 
     def send_read(self, content):
         # Executando a leitura da resposta da API.

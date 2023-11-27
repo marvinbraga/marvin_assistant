@@ -24,6 +24,7 @@ redis = "^5.0.1"
 pypdf = "^3.17.1"
 jq = "^1.6.0"
 invoke = "^2.2.0"
+pyaudio = "^0.2.14"
 
 [build-system]
 requires = ["poetry-core"]

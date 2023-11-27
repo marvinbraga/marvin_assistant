@@ -1,6 +1,7 @@
 import threading
 from abc import ABCMeta, abstractmethod
 
+# sudo apt install python3-pyaudio portaudio19-dev
 import pyaudio
 
 

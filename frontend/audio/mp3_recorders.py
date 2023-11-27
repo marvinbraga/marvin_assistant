@@ -6,10 +6,10 @@ import wave
 
 
 class Mp3Recorder(AbstractAudioRecorder):
-    COMMAND_OUTPUT_FILENAME = "frontend/resources/command.mp3"
+    COMMAND_OUTPUT_FILENAME = "resources/command.mp3"
 
     def _save(self):
-        temp_filename = os.path.normpath("frontend/resources/temp.wav")
+        temp_filename = os.path.normpath("resources/temp.wav")
         try:
             with wave.open(temp_filename, 'wb') as wf:
                 wf.setnchannels(self._channels)

@@ -5,7 +5,7 @@ from frontend.audio.abstract_recorders import AbstractAudioRecorder
 
 
 class WaveRecorder(AbstractAudioRecorder):
-    COMMAND_OUTPUT_FILENAME = "frontend/resources/command.wav"
+    COMMAND_OUTPUT_FILENAME = "resources/command.wav"
 
     def _save(self):
         with wave.open(os.path.normpath(self.COMMAND_OUTPUT_FILENAME), 'wb') as wf:

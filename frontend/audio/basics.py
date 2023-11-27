@@ -3,7 +3,7 @@ from frontend.audio.players import AudioPlayer
 
 
 class AudioRecorder:
-    SOUND_BEEP = "frontend/resources/beep_short.mp3"
+    SOUND_BEEP = "resources/beep_short.mp3"
 
     def __init__(self, recorder: AbstractAudioRecorder):
         self._recorder = recorder

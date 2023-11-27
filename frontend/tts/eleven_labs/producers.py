@@ -2,7 +2,7 @@ import os.path
 
 
 class VoiceProducer:
-    out_content_file = "frontend/resources/out_content_file.mp3"
+    out_content_file = "resources/out_content_file.mp3"
 
     def __init__(self, content):
         self._content = content

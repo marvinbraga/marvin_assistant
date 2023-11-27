@@ -17,7 +17,7 @@ class ConversationSerializer:
             "conversation": {
                 "key_id": self._conversation.session_id,
                 "messages": [
-                    {"role": m.type, "content": m.content} for m in self._conversation.get_messages
+                    {"role": m.type, "content": m.content} for m in self._conversation.get_messages()
                 ]
             }
         }
@@ -55,9 +55,10 @@ class Conversation:
         self._memory.add_ai_message(message)
         return self
 
-    def get_messages_json(self, to_str=True):
+    def get_messages_json(self, as_str=True):
         serializer = ConversationSerializer(self)
-        return serializer.json() if to_str else serializer.dict()
+        result = serializer.json() if as_str else serializer.dict()
+        return result
 
 
 if __name__ == '__main__':
