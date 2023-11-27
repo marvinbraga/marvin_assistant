@@ -73,6 +73,6 @@ Distributed under the **GNU General Public License v3.0**. See `LICENSE` for mor
 
 ## Contact
 
-Marcus Vinicius Braga - [mvbraga@gmail.com](mailto:mvbraga@gmail.com)
+Marcus Vinicius Braga - LinkedIn [https://www.linkedin.com/in/marvinbraga/](https://www.linkedin.com/in/marvinbraga/)
 
 Project Link: [https://github.com/marvinbraga/marvin_assistant](https://github.com/marvinbraga/marvin_assistant)
