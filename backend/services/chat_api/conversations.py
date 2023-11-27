@@ -8,6 +8,24 @@ from langchain.schema import SystemMessage
 load_dotenv(find_dotenv())
 
 
+class ConversationSerializer:
+    def __init__(self, conversation):
+        self._conversation = conversation
+
+    def dict(self):
+        return {
+            "conversation": {
+                "key_id": self._conversation.session_id,
+                "messages": [
+                    {"role": m.type, "content": m.content} for m in self._conversation.get_messages
+                ]
+            }
+        }
+
+    def json(self):
+        return json.dumps(self.dict())
+
+
 class Conversation:
 
     def __init__(self, session_id):
@@ -17,6 +35,10 @@ class Conversation:
             session_id=session_id,
             url=redis_url,
         )
+
+    @property
+    def session_id(self):
+        return self._session_id
 
     def get_messages(self):
         return self._memory.messages
@@ -34,17 +56,8 @@ class Conversation:
         return self
 
     def get_messages_json(self, to_str=True):
-        result = {
-            "conversation": {
-                "key_id": self._session_id,
-                "messages": [
-                    {"role": m.type, "content": m.content} for m in self._memory.messages
-                ]
-            }
-        }
-        if to_str:
-            result = json.dumps(result)
-        return result
+        serializer = ConversationSerializer(self)
+        return serializer.json() if to_str else serializer.dict()
 
 
 if __name__ == '__main__':
