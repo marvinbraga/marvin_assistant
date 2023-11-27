@@ -28,4 +28,5 @@ async def llm_conversation():
 @app.post("/api/gpt")
 async def chat_with_llm(json_data: dict = Body(None)):
     print("JSON: ", json_data)
-    return f"Mensagem respondida às {datetime.now()}."
+    result = f"Mensagem respondida às {datetime.now()}."
+    return result
