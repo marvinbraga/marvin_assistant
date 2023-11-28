@@ -1,4 +1,5 @@
 import os.path
+import warnings
 
 import pygame
 
@@ -11,6 +12,7 @@ from frontend.tts.eleven_labs.producers import VoiceProducer
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
+warnings.filterwarnings('ignore')
 
 
 class VoiceAssistant:
@@ -20,6 +22,8 @@ class VoiceAssistant:
     def __init__(self, audio_recorder, audio_loader, tts_api):
         pygame.init()
         pygame.display.set_caption("Assistente de Voz")
+        self.user = "marcus"
+        self.conversation = "02"
         self.screen = pygame.display.set_mode((640, 480))
         self.chat_ui = ChatUI(self.screen)
         self.tts_api = tts_api
@@ -49,7 +53,7 @@ class VoiceAssistant:
                 self.send_command()
             elif event.type == READ_CONTENT_MESSAGE_EVENT:
                 content = event.content
-                # self.read_content(content)
+                self.read_content(content)
 
     def start_recording(self):
         self.is_recording = self.audio_recorder.start().is_recording
@@ -86,10 +90,9 @@ class VoiceAssistant:
         except OSError as e:
             print(f"Error: {e.strerror}")
 
-    @staticmethod
-    def _send_message_to_chat(message):
+    def _send_message_to_chat(self, message):
         chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
-        return chat_api.post(user_id="marcus", conversation_id="01", message=message)
+        return chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
 
     @staticmethod
     def _extract_response_message(response):
