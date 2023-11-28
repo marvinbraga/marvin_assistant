@@ -1,18 +1,22 @@
 import os.path
+import uuid
+
 from playsound import playsound
 
 
 class VoiceProducer:
-    out_content_file = "resources/out_content_file.mp3"
 
-    def __init__(self, content):
+    def __init__(self, content, remove_after=False):
+        self._remove_after = remove_after
         self._content = content
+        self.out_content_file = f"resources/out_content_{uuid.uuid4()}.mp3"
 
     def play(self, filename):
         try:
             playsound(filename)
         finally:
-            os.remove(filename)
+            if self._remove_after:
+                os.remove(filename)
         return self
 
     def make(self, thread_run=False):

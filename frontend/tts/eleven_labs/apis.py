@@ -1,7 +1,7 @@
 import json
 import os.path
 
-import requests
+import aiohttp
 
 
 class ElevenLabsApi:
@@ -13,7 +13,7 @@ class ElevenLabsApi:
         self._similarity_boost = similarity_boost
         self._language = language
 
-    def get_audio(self, message):
+    async def get_audio(self, message):
         payload = {
             "text": message,
             "model_id": "eleven_multilingual_v2",
@@ -31,32 +31,35 @@ class ElevenLabsApi:
         }
 
         voice = self._settings.get_voice_id(self._name)
-        response = requests.post(
-            f'https://api.elevenlabs.io/v1/text-to-speech/{voice}?optimize_streaming_latency=0',
-            json=payload,
-            headers=headers,
-        )
-        if response.status_code == 200 and response.content:
-            return response
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                    f'https://api.elevenlabs.io/v1/text-to-speech/{voice}?optimize_streaming_latency=0',
+                    json=payload,
+                    headers=headers,
+            ) as response:
+                if response.status == 200:
+                    return await response.read()
+                else:
+                    raise Exception(f"Problemas com o áudio - {response.status}.")
 
-        raise Exception(f"Problemas com o áudio - {response.status_code}.")
-
-    def list(self):
+    async def list(self):
         url = "https://api.elevenlabs.io/v1/voices"
         headers = {
             "Accept": "application/json",
             "xi-api-key": self._settings.values["ELEVEN_LABS_API_KEY"],
         }
-        response = requests.get(url, headers=headers)
-        if response.status_code < 400:
-            json_content = json.dumps(response.json(), indent=4)
-            with open(os.path.normpath(self._settings.filename), 'w') as f:
-                f.write(json_content)
 
-            result = [voice["name"] for voice in response.json()["voices"]]
-            return result
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers=headers) as response:
+                if response.status < 400:
+                    json_content = json.dumps(await response.json(), indent=4)
+                    with open(os.path.normpath(self._settings.filename), 'w') as f:
+                        f.write(json_content)
 
-        return response.text
+                    result = [voice["name"] for voice in await response.json()["voices"]]
+                    return result
+                else:
+                    return await response.text()
 
 
 if __name__ == '__main__':
@@ -64,5 +67,14 @@ if __name__ == '__main__':
 
     # Para criar seu arquivo de voices.
     _settings = Settings(name="Bella", filename="../../resources/voices.json")
-    print(ElevenLabsApi(settings=_settings).list())
 
+
+    async def main():
+        api = ElevenLabsApi(settings=_settings)
+        result = await api.list()
+        print(result)
+
+
+    import asyncio
+
+    asyncio.run(main())
