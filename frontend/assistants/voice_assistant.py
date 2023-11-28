@@ -1,7 +1,11 @@
+import asyncio
+import logging
 import os.path
+import threading
 import warnings
 
 import pygame
+from dotenv import load_dotenv, find_dotenv
 
 from frontend.assistants.events import SEND_COMMAND_MESSAGE_EVENT, send_command_event, READ_CONTENT_MESSAGE_EVENT
 from frontend.audio.audio_to_text import AudioTranscript
@@ -9,10 +13,20 @@ from frontend.audio.players import AudioPlayer
 from frontend.chats.basic_ui import ChatUI
 from frontend.services.chat_api import ChatApi
 from frontend.tts.eleven_labs.producers import VoiceProducer
-from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 warnings.filterwarnings('ignore')
+logging.basicConfig(level=logging.INFO)
+logging.info("Teste de log voice_assistant.")
+
+
+def start_async_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+
+async_loop = asyncio.new_event_loop()
+threading.Thread(target=start_async_loop, args=(async_loop,), daemon=True).start()
 
 
 class VoiceAssistant:
@@ -50,10 +64,10 @@ class VoiceAssistant:
             elif event.type == pygame.MOUSEBUTTONUP:
                 self.stop_recording()
             elif event.type == SEND_COMMAND_MESSAGE_EVENT:
-                self.send_command()
+                asyncio.run_coroutine_threadsafe(self.send_command(), async_loop)
             elif event.type == READ_CONTENT_MESSAGE_EVENT:
                 content = event.content
-                self.read_content(content)
+                asyncio.run_coroutine_threadsafe(self.read_content(content), async_loop)
 
     def start_recording(self):
         self.is_recording = self.audio_recorder.start().is_recording
@@ -65,17 +79,22 @@ class VoiceAssistant:
         pygame.event.post(send_command_event)
         return self
 
-    def send_command(self):
+    async def send_command(self):
+        logging.info("INICIANDO: Transcrição do comando.")
         command = self._transcribe_audio()
         self._display_transcribed_message(command)
         self._remove_audio_file()
+        logging.info("FINALIZANDO: Transcrição do comando.")
 
-        response = self._send_message_to_chat(command)
+        # Faz a chamada assíncrona e aguarda a resposta
+        logging.info("INICIANDO: response = await self._send_message_to_chat(command)")
+        response = await self._send_message_to_chat(command)
+        logging.info("FINALIZANDO: response = await self._send_message_to_chat(command)")
+
         assistant_response = self._extract_response_message(response)
         self._display_assistant_message(assistant_response)
 
         self.send_read(content=assistant_response)
-        return self
 
     def _transcribe_audio(self):
         docs = AudioTranscript(loader=self.audio_loader).execute().docs
@@ -90,9 +109,9 @@ class VoiceAssistant:
         except OSError as e:
             print(f"Error: {e.strerror}")
 
-    def _send_message_to_chat(self, message):
+    async def _send_message_to_chat(self, message):
         chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
-        return chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
+        return await chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
 
     @staticmethod
     def _extract_response_message(response):
@@ -115,10 +134,13 @@ class VoiceAssistant:
         pygame.event.post(read_content_event)
         return self
 
-    def read_content(self, content):
+    async def read_content(self, content):
+        logging.info("INICIANDO: o TTS.")
         # Recupera o áudio via API.
-        response = self.tts_api.get_audio(message=content)
+        audio_data = await self.tts_api.get_audio(message=content)
+        logging.info("FINALIZANDO: o TTS.")
         # Executa o arquivo de áudio.
-        filename = os.path.normpath(VoiceProducer(response.content).make().out_content_file)
+        logging.info("INICIANDO: Execução do áudio.")
+        filename = os.path.normpath(VoiceProducer(audio_data).make().out_content_file)
         AudioPlayer(filename).execute()
-        return self
+        logging.info("FINALIZANDO: Execução do áudio.")
