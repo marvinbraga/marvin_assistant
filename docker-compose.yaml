@@ -39,7 +39,7 @@ services:
     expose:
       - "5000"
     ports:
-      - "5000:80"
+      - "5000:5000"
     env_file:
       - .env
     environment:
@@ -55,7 +55,7 @@ services:
     expose:
       - "8000"
     ports:
-      - "8000:80"
+      - "8000:8000"
     env_file:
       - .env
     environment:
@@ -64,6 +64,21 @@ services:
     depends_on:
       - wait_services
   
+  front_pygame:
+    build:
+      context: .
+      dockerfile: ./.docker/frontend/Dockerfile
+    env_file:
+      - .env
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
+      - CHAT_HOST=${CHAT_HOST}
+      - CHAT_PORT=${CHAT_PORT}
+    depends_on:
+      - svc_chat_api
+      - svc_llm_api
+
   pgadmin:
     image: dpage/pgadmin4
     depends_on:
@@ -74,7 +89,7 @@ services:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - "5051:80"
+      - "5051:5051"
     restart: always
     volumes:
       - pgadmin:/root/.pgadmin
