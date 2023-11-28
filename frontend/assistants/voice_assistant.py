@@ -1,6 +1,9 @@
+import asyncio
 import os.path
+import threading
 import warnings
 
+import aiohttp
 import pygame
 
 from frontend.assistants.events import SEND_COMMAND_MESSAGE_EVENT, send_command_event, READ_CONTENT_MESSAGE_EVENT
@@ -13,6 +16,16 @@ from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
 warnings.filterwarnings('ignore')
+
+
+def start_async_loop(loop):
+    asyncio.set_event_loop(loop)
+    loop.run_forever()
+
+
+# Em algum lugar no seu código de inicialização
+async_loop = asyncio.new_event_loop()
+threading.Thread(target=start_async_loop, args=(async_loop,), daemon=True).start()
 
 
 class VoiceAssistant:
@@ -70,7 +83,26 @@ class VoiceAssistant:
         self._display_transcribed_message(command)
         self._remove_audio_file()
 
-        response = self._send_message_to_chat(command)
+        # Inicia a tarefa assíncrona
+        future = asyncio.run_coroutine_threadsafe(
+            self.async_send_message_to_chat(
+                os.environ["CHAT_HOST"],
+                os.environ["CHAT_PORT"],
+                self.user,
+                self.conversation,
+                command
+            ), async_loop)
+
+        # Aguarda a conclusão da tarefa assíncrona e obtém a resposta
+        try:
+            response = future.result(timeout=10)
+        except asyncio.TimeoutError:
+            print("A operação demorou muito e foi cancelada.")
+            return self
+        except Exception as e:
+            print(f"Ocorreu um erro: {e}")
+            return self
+
         assistant_response = self._extract_response_message(response)
         self._display_assistant_message(assistant_response)
 
@@ -93,6 +125,15 @@ class VoiceAssistant:
     def _send_message_to_chat(self, message):
         chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
         return chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
+
+    @staticmethod
+    async def async_send_message_to_chat(host, port, user_id, conversation_id, message):
+        async with aiohttp.ClientSession() as session:
+            # Substitua 'url' pela URL correta da sua API
+            url = f"http://{host}:{port}/api_endpoint"
+            data = {'user_id': user_id, 'conversation_id': conversation_id, 'message': message}
+            async with session.post(url, json=data) as response:
+                return await response.json()
 
     @staticmethod
     def _extract_response_message(response):

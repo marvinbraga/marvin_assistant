@@ -44,19 +44,17 @@ class LLMConnection:
     def _update_memory(self):
         # Limpa a memória.
         self._memory.load_memory_variables({})
-        # Atualiza a memória
-        data = []
+        # Processa as mensagens
+        last_human_msg = None
         for msg in self._messages:
             if isinstance(msg, HumanMessage):
-                if len(data):
-                    data = []
-                data.append({"input": msg.content})
-                continue
-            if isinstance(msg, AIMessage):
-                data.append({"output": msg.content})
-
-            self._memory.save_context(*data)
-            data = []
+                last_human_msg = msg
+            elif isinstance(msg, AIMessage) and last_human_msg is not None:
+                self._memory.save_context(
+                    {"input": last_human_msg.content},
+                    {"output": msg.content}
+                )
+                last_human_msg = None
 
         return self
 
