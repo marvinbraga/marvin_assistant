@@ -51,3 +51,19 @@ def logs(c, service=None):
 def shell(c, service):
     """Acessa o shell de um serviço específico."""
     c.run(f"{compose_cmd} exec {service} /bin/bash")
+
+
+@task
+def prune_all(c):
+    """
+    Ex.: inv prune-all
+    """
+    c.run("docker system prune --all")
+    c.run("docker volume prune")
+    c.run("sudo service docker restart")
+
+
+@task
+def sh(c, svc=""):
+    cmd = f'{compose_cmd} exec "{svc}" bash'
+    c.run(cmd)

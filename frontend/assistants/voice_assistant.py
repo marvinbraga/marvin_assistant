@@ -79,23 +79,6 @@ class VoiceAssistant:
         pygame.event.post(send_command_event)
         return self
 
-    async def send_command(self):
-        logging.info("INICIANDO: Transcrição do comando.")
-        command = self._transcribe_audio()
-        self._display_transcribed_message(command)
-        self._remove_audio_file()
-        logging.info("FINALIZANDO: Transcrição do comando.")
-
-        # Faz a chamada assíncrona e aguarda a resposta
-        logging.info("INICIANDO: response = await self._send_message_to_chat(command)")
-        response = await self._send_message_to_chat(command)
-        logging.info("FINALIZANDO: response = await self._send_message_to_chat(command)")
-
-        assistant_response = self._extract_response_message(response)
-        self._display_assistant_message(assistant_response)
-
-        self.send_read(content=assistant_response)
-
     def _transcribe_audio(self):
         docs = AudioTranscript(loader=self.audio_loader).execute().docs
         return "".join([doc.page_content for doc in docs])
@@ -108,10 +91,6 @@ class VoiceAssistant:
             os.remove(self.audio_recorder.recorder.COMMAND_OUTPUT_FILENAME)
         except OSError as e:
             print(f"Error: {e.strerror}")
-
-    async def _send_message_to_chat(self, message):
-        chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
-        return await chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
 
     @staticmethod
     def _extract_response_message(response):
@@ -133,6 +112,27 @@ class VoiceAssistant:
         )
         pygame.event.post(read_content_event)
         return self
+
+    async def send_command(self):
+        logging.info("INICIANDO: Transcrição do comando.")
+        command = self._transcribe_audio()
+        self._display_transcribed_message(command)
+        self._remove_audio_file()
+        logging.info("FINALIZANDO: Transcrição do comando.")
+
+        # Faz a chamada assíncrona e aguarda a resposta
+        logging.info("INICIANDO: response = await self._send_message_to_chat(command)")
+        response = await self._send_message_to_chat(command)
+        logging.info("FINALIZANDO: response = await self._send_message_to_chat(command)")
+
+        assistant_response = self._extract_response_message(response)
+        self._display_assistant_message(assistant_response)
+
+        self.send_read(content=assistant_response)
+
+    async def _send_message_to_chat(self, message):
+        chat_api = ChatApi(host=os.environ["CHAT_HOST"], port=os.environ["CHAT_PORT"])
+        return await chat_api.post(user_id=self.user, conversation_id=self.conversation, message=message)
 
     async def read_content(self, content):
         logging.info("INICIANDO: o TTS.")

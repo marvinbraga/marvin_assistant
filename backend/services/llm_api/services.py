@@ -8,40 +8,23 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage, BaseMessage
 load_dotenv(find_dotenv())
 
 
-class LLMConnection:
-
-    def __init__(self, data):
+class ConversationMemoryLoader:
+    def __init__(self, memory, data):
         self._data = data
+        self._memory = memory
         self._messages: list[BaseMessage] = []
-        self._memory = ConversationBufferMemory(return_messages=True, ai_prefix="AI Assistant")
-        self._prompt = None
-        self._message = None
-        self._output = ""
 
     @property
-    def output(self):
-        return self._output
+    def messages(self):
+        return self._messages
 
-    def _create_messages(self, conversation):
+    def _create_messages(self):
         role_class_map = {
             "ai": AIMessage,
             "human": HumanMessage,
             "system": SystemMessage
         }
-        self._messages = [role_class_map[message["role"]](content=message["content"]) for message in conversation]
-        return self
-
-    def _create_prompt(self):
-        system_message = self._messages.pop(0)
-        prompt = system_message.content + """
-        
-        Conversa atual:
-        {history}
-        
-        AI Assistant: 
-        {input}
-        """
-        self._prompt = PromptTemplate(input_variables=["history", "input"], template=prompt)
+        self._messages = [role_class_map[message["role"]](content=message["content"]) for message in self._data]
         return self
 
     def _update_memory(self):
@@ -58,18 +41,44 @@ class LLMConnection:
                     {"output": msg.content}
                 )
                 last_human_msg = None
-
         return self
 
-    def get_message(self):
-        # Recupera a última mensagem recebida
-        self._message = self._messages[-1]
+    def load(self):
+        self._create_messages()._update_memory()
+        return self
+
+
+class LLMConnection:
+
+    def __init__(self, data):
+        self._data = data
+        self._messages: list[BaseMessage] = []
+        self._memory = ConversationBufferMemory(return_messages=True, ai_prefix="AI Assistant")
+        self._prompt = None
+        self._output = ""
+
+    @property
+    def output(self):
+        return self._output
+
+    def _create_prompt(self):
+        system_message = self._messages.pop(0)
+        prompt = system_message.content + """
+        
+        Conversa atual:
+        {history}
+        
+        AI Assistant: 
+        {input}
+        """
+        self._prompt = PromptTemplate(input_variables=["history", "input"], template=prompt)
         return self
 
     def send(self):
-        self._create_messages(
-            self._data["conversation"]["messages"]
-        )._create_prompt()._update_memory().get_message()
+        data = self._data["conversation"]["messages"]
+        self._messages = ConversationMemoryLoader(self._memory, data).load().messages
+        self._create_prompt()
+        message = self._messages[-1]
         llm = ChatOpenAI(temperature=0.9, model="gpt-3.5-turbo")
         chain = ConversationChain(
             llm=llm,
@@ -77,5 +86,5 @@ class LLMConnection:
             prompt=self._prompt,
             # max_tokens=300,
         )
-        self._output = chain.predict(input=self._message.content)
+        self._output = chain.predict(input=message.content)
         return self

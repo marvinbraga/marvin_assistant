@@ -64,21 +64,6 @@ services:
     depends_on:
       - wait_services
   
-  front_pygame:
-    build:
-      context: .
-      dockerfile: ./.docker/frontend/Dockerfile
-    env_file:
-      - .env
-    environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY}
-      - ELEVEN_LABS_API_KEY=${ELEVEN_LABS_API_KEY}
-      - CHAT_HOST=${CHAT_HOST}
-      - CHAT_PORT=${CHAT_PORT}
-    depends_on:
-      - svc_chat_api
-      - svc_llm_api
-
   pgadmin:
     image: dpage/pgadmin4
     depends_on:
