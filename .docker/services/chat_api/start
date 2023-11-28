@@ -4,4 +4,4 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-exec uvicorn app:app --host 0.0.0.0 --port 80
+exec uvicorn backend.services.chat_api.app:app --host 0.0.0.0 --port 5000

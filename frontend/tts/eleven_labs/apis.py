@@ -6,7 +6,7 @@ import aiohttp
 
 class ElevenLabsApi:
 
-    def __init__(self, settings, stability=0.15, similarity_boost=0.5, language="portuguese"):
+    def __init__(self, settings, stability=0.5, similarity_boost=0.7, language="portuguese"):
         self._name = settings.name
         self._settings = settings
         self._stability = stability

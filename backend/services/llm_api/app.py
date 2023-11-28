@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 
 from dotenv import find_dotenv, load_dotenv
 from fastapi import FastAPI, Body

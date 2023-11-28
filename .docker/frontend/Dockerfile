@@ -10,7 +10,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
    libpq-dev \
    libgirepository1.0-dev \
    libcairo2-dev pkg-config python3-dev \
-   python3-pyaudio portaudio19-dev
+   python3-pyaudio portaudio19-dev \
+   libportaudio2
 
 COPY ./pyproject.toml ./
 
@@ -31,6 +32,7 @@ ARG APP_HOME=/apps
 ENV PYTHONPATH /apps
 
 ENV BUILD_ENV ${BUILD_ENVIRONMENT}
+ENV LD_LIBRARY_PATH /usr/lib:/usr/local/lib:$LD_LIBRARY_PATH
 
 WORKDIR ${APP_HOME}
 
@@ -42,14 +44,16 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 COPY --from=python-build-stage /usr/src/app/wheels /wheels/
 
-RUN pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
-   && rm -rf /wheels/
+RUN pip install --upgrade pip \
+   && pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
+   && rm -rf /wheels/ \
+   && pip install pyaudio
 
-# Inicialização do serviço de comunicação com o chat.
-COPY ./.docker/services/chat_api/start /start
+# Inicialização do frontend com o pygame.
+COPY ./.docker/frontend/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
-COPY ./backend ${APP_HOME}/backend
+COPY ./frontend ${APP_HOME}/frontend
 
 ENTRYPOINT ["/start"]

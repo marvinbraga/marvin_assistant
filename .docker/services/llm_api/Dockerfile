@@ -1,4 +1,4 @@
-ARG PYTHON_VERSION=3.10-slim-buster
+ARG PYTHON_VERSION=3.10-slim-bullseye
 
 FROM python:${PYTHON_VERSION} as python
 
@@ -7,11 +7,17 @@ ARG BUILD_ENVIRONMENT=local
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
    build-essential \
-   libpq-dev
+   libpq-dev \
+   libgirepository1.0-dev \
+   libcairo2-dev pkg-config python3-dev \
+   python3-pyaudio portaudio19-dev
+
+RUN apt-get update -y && apt-get upgrade -y
 
 COPY ./pyproject.toml ./
 
-RUN pip install poetry && \
+RUN pip install --upgrade pip && \
+    pip install poetry && \
     poetry export --without-hashes -f requirements.txt -o requirements.txt && \
     pip uninstall -y poetry
 
@@ -44,6 +50,6 @@ COPY ./.docker/services/llm_api/start /start
 RUN sed -i 's/\r$//g' /start
 RUN chmod +x /start
 
-COPY ./backend/services/llm_api ${APP_HOME}
+COPY ./backend ${APP_HOME}/backend
 
 ENTRYPOINT ["/start"]
