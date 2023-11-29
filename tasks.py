@@ -33,7 +33,7 @@ def down(c):
 
 
 @task
-def rebuild(c):
+def build(c):
     """Reconstrói e inicia os serviços."""
     c.run(f"{compose_cmd} up -d --build")
 

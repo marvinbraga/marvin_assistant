@@ -14,6 +14,8 @@ from frontend.chats.basic_ui import ChatUI
 from frontend.services.chat_api import ChatApi
 from frontend.tts.eleven_labs.producers import VoiceProducer
 
+pygame.init()
+
 load_dotenv(find_dotenv())
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
@@ -30,16 +32,14 @@ threading.Thread(target=start_async_loop, args=(async_loop,), daemon=True).start
 
 
 class VoiceAssistant:
-    BASE_COLOR = (64, 64, 64)
-    RECORDING_COLOR = (144, 238, 144)
 
     def __init__(self, audio_recorder, audio_loader, tts_api):
         pygame.init()
         pygame.display.set_caption("Assistente de Voz")
-        self.user = "marcus"
-        self.conversation = "02"
-        self.screen = pygame.display.set_mode((640, 480))
-        self.chat_ui = ChatUI(self.screen)
+        self.user = "Marcus"
+        self.conversation = "03"
+        self.screen = pygame.display.set_mode((800, 600))
+        self.chat_ui = ChatUI(self.screen, self.user)
         self.tts_api = tts_api
         self.audio_recorder = audio_recorder
         self.audio_loader = audio_loader
@@ -48,9 +48,7 @@ class VoiceAssistant:
 
     def run(self):
         while self.running:
-            current_color = self.RECORDING_COLOR if self.is_recording else self.BASE_COLOR
-            self.screen.fill(current_color)
-            self.chat_ui.draw()
+            self.chat_ui.update()
             self.handle_events()
             pygame.display.flip()
         pygame.quit()
@@ -60,9 +58,11 @@ class VoiceAssistant:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.start_recording()
+                if self.chat_ui.is_button_pressed(event):
+                    self.start_recording()
             elif event.type == pygame.MOUSEBUTTONUP:
-                self.stop_recording()
+                if self.chat_ui.is_button_pressed(event):
+                    self.stop_recording()
             elif event.type == SEND_COMMAND_MESSAGE_EVENT:
                 asyncio.run_coroutine_threadsafe(self.send_command(), async_loop)
             elif event.type == READ_CONTENT_MESSAGE_EVENT:
@@ -84,7 +84,7 @@ class VoiceAssistant:
         return "".join([doc.page_content for doc in docs])
 
     def _display_transcribed_message(self, message):
-        self.chat_ui.add_message(f"User: {message}")
+        self.chat_ui.add_message(message)
 
     def _remove_audio_file(self):
         try:
@@ -100,7 +100,7 @@ class VoiceAssistant:
         return msg
 
     def _display_assistant_message(self, message):
-        self.chat_ui.add_message(f"Assistant: {message}")
+        self.chat_ui.add_message(message)
 
     def send_read(self, content):
         # Executando a leitura da resposta da API.

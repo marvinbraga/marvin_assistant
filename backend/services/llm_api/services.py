@@ -1,3 +1,5 @@
+import json
+
 from dotenv import load_dotenv, find_dotenv
 from langchain.chains import ConversationChain
 from langchain.chat_models import ChatOpenAI
@@ -84,7 +86,6 @@ class LLMConnection:
             llm=llm,
             memory=self._memory,
             prompt=self._prompt,
-            # max_tokens=300,
         )
         self._output = chain.predict(input=message.content)
         return self

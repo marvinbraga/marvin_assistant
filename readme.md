@@ -50,7 +50,7 @@ To set up the development environment, follow these steps:
 To run the back-end, with `Docker Compose` use the following command in the terminal:
 
 ```shell
-inv rebuild
+inv build
 ```
 
 ### Execution

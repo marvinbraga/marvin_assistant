@@ -43,7 +43,9 @@ class ConversationService:
         # Manda a nova mensagem do usuário para o LLM Service.
         conversation = self._conversation.get_messages_json(as_str=False)
         content = self._llm_api_service.post(conversation)
-        self._conversation.post_ai_message(content)
+        # Converte a resposta que chega em tipo byte.
+        result = content.decode("utf-8").strip('"').replace('\\', '')
+        self._conversation.post_ai_message(result)
 
         # Devolve a conversa atualizada com a resposta da IA.
         return self._conversation.get_messages_json(as_str=False)
