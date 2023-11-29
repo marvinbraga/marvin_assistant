@@ -53,7 +53,7 @@ def shell(c, service):
     c.run(f"{compose_cmd} exec {service} /bin/bash")
 
 
-@task
+@task(pre=[down])
 def prune_all(c):
     """
     Ex.: inv prune-all
