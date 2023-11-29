@@ -44,8 +44,15 @@ class ConversationService:
         conversation = self._conversation.get_messages_json(as_str=False)
         content = self._llm_api_service.post(conversation)
         # Converte a resposta que chega em tipo byte.
-        result = content.decode("utf-8").strip('"').replace('\\', '')
+        result = self.adjust_content(content)
         self._conversation.post_ai_message(result)
 
         # Devolve a conversa atualizada com a resposta da IA.
         return self._conversation.get_messages_json(as_str=False)
+
+    @staticmethod
+    def adjust_content(content):
+        result = content.decode("utf-8").strip('"')
+        result = result.replace('\\n', ' ')
+        result = result.replace('\\', '')
+        return result

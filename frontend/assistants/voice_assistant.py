@@ -99,9 +99,6 @@ class VoiceAssistant:
         msg = messages[-1].get("content") if messages else "No response received"
         return msg
 
-    def _display_assistant_message(self, message):
-        self.chat_ui.add_message(message)
-
     def send_read(self, content):
         # Executando a leitura da resposta da API.
         data = {"content": content}
@@ -126,7 +123,6 @@ class VoiceAssistant:
         logging.info("FINALIZANDO: response = await self._send_message_to_chat(command)")
 
         assistant_response = self._extract_response_message(response)
-        self._display_assistant_message(assistant_response)
 
         self.send_read(content=assistant_response)
 
@@ -142,5 +138,6 @@ class VoiceAssistant:
         # Executa o arquivo de áudio.
         logging.info("INICIANDO: Execução do áudio.")
         filename = os.path.normpath(VoiceProducer(audio_data).make().out_content_file)
+        self.chat_ui.add_message(content)
         AudioPlayer(filename).execute()
         logging.info("FINALIZANDO: Execução do áudio.")
