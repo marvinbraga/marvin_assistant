@@ -32,7 +32,7 @@ def down(c):
     c.run(f"{compose_cmd} down --remove-orphans")
 
 
-@task
+@task(pre=[down])
 def build(c):
     """Reconstrói e inicia os serviços."""
     c.run(f"{compose_cmd} up -d --build")
