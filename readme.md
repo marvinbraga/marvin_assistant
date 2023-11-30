@@ -32,6 +32,24 @@ response back into speech.
 - Python 3.10 or higher
 - Poetry (Python package manager)
 
+```shell
+sudo apt update -y 
+```
+
+```shell
+sudo apt install --no-install-recommends -y \
+   build-essential \
+   libpq-dev \
+   libgirepository1.0-dev \
+   libcairo2-dev pkg-config python3-dev \
+   python3-pyaudio portaudio19-dev \
+   libportaudio2
+```
+
+```shell
+sudo apt update -y && sudo apt upgrade -y
+```
+
 ### Installation
 
 To set up the development environment, follow these steps:
