@@ -72,15 +72,17 @@ def sh(c, svc=""):
 
 @task
 def start_ngrok(c):
-    config_path = os.path.normpath("backend/services/whatsapp_api/.ngrok/ngrok-config.yml")
+    config_path = os.path.normpath(os.environ["NGROK_CONFIG_PATH"])
 
     if sys.platform.startswith('win'):
         # Windows
-        ngrok_path = os.path.normpath(os.environ["NGROK_WIN_PATH"])
+        ngrok_path = os.path.normpath(os.environ["NGROK_PATH"])
         with c.cd(ngrok_path):
             cmd = f"start cmd /k .\\ngrok.exe start --config={config_path} customdomain"
             c.run(cmd)
     elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
         # Linux and macOS
-        cmd = f"./ngrok start --config={config_path} customdomain"
-        c.run(cmd, pty=True)
+        ngrok_path = os.path.normpath(os.environ["NGROK_PATH"])
+        with c.cd(ngrok_path):
+            cmd = f"./ngrok start --config={config_path} customdomain"
+            c.run(cmd, pty=True)

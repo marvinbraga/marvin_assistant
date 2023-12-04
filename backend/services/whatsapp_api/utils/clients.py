@@ -2,19 +2,21 @@ import json
 import logging
 import os
 
-import httpx
-from backend.services.whatsapp_api.utils.abstracts import AbstractMessageProcessor
+import aiohttp
 from dotenv import load_dotenv, find_dotenv
+
+from backend.services.whatsapp_api.utils.abstracts import AbstractMessageProcessor
 
 load_dotenv(find_dotenv())
 
 
 class Logger:
     @staticmethod
-    def log_http_response(response):
-        logging.info(f"Status: {response.status_code}")
+    async def log_http_response(response):
+        logging.info(f"Status: {response.status}")
         logging.info(f"Content-type: {response.headers.get('content-type')}")
-        logging.info(f"Body: {response.text}")
+        body = await response.text()
+        logging.info(f"Body: {body}")
 
     @staticmethod
     def show_info(text):
@@ -43,18 +45,15 @@ class WhatsAppClient:
 
     async def send_message(self, data):
         """
-        Envia uma mensagem através da API do WhatsApp de forma assíncrona.
+        Envia uma mensagem através da API do WhatsApp de forma assíncrona usando aiohttp.
         """
-        async with httpx.AsyncClient() as client:
+        async with aiohttp.ClientSession() as session:
             try:
-                response = await client.post(self.base_url, data=data, headers=self.headers, timeout=10)
-                response.raise_for_status()
-                Logger.log_http_response(response)
-                return response.json()
-            except httpx.TimeoutException:
-                Logger.log_error("Timeout occurred while sending message")
-                return {"status": "error", "message": "Request timed out"}
-            except httpx.RequestError as e:
+                async with session.post(self.base_url, data=data, headers=self.headers, timeout=10) as response:
+                    response.raise_for_status()
+                    await Logger.log_http_response(response)
+                    return await response.json()
+            except aiohttp.ClientError as e:
                 Logger.log_error(f"Request failed due to: {e}")
                 return {"status": "error", "message": "Failed to send message"}
 

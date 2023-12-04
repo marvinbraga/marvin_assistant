@@ -21,7 +21,7 @@ async def handle_message(body: dict):
         return JSONResponse(content={"status": "ok"})
 
     try:
-        if WhatsAppMessageHandler(body).process_message():
+        if await WhatsAppMessageHandler(body).process_message():
             return JSONResponse(content={"status": "ok"})
         else:
             raise HTTPException(

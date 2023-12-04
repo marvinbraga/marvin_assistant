@@ -1,5 +1,3 @@
-import json
-
 from dotenv import load_dotenv, find_dotenv
 from langchain.chains import ConversationChain
 from langchain.chat_models import ChatOpenAI

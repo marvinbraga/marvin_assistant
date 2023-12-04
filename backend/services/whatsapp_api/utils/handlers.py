@@ -1,6 +1,6 @@
 import os
 
-from clients import WhatsAppClient, MessageProcessor, Logger
+from backend.services.whatsapp_api.utils.clients import WhatsAppClient, MessageProcessor, Logger
 from dotenv import load_dotenv, find_dotenv
 
 load_dotenv(find_dotenv())
