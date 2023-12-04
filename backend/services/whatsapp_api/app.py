@@ -4,10 +4,12 @@ import logging
 from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.responses import JSONResponse
 
+from backend.services.whatsapp_api.utils.config import configure_logging
 from security import signature_required
 from utils.handlers import WhatsAppMessageHandler
 
 app = FastAPI()
+configure_logging()
 
 
 async def handle_message(body: dict):

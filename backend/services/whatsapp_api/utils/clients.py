@@ -6,8 +6,10 @@ import aiohttp
 from dotenv import load_dotenv, find_dotenv
 
 from backend.services.whatsapp_api.utils.abstracts import AbstractMessageProcessor
+from backend.services.whatsapp_api.utils.config import configure_logging
 
 load_dotenv(find_dotenv())
+configure_logging()
 
 
 class Logger:
@@ -69,17 +71,3 @@ class WhatsAppClient:
             "type": "text",
             "text": {"preview_url": False, "body": text},
         })
-
-
-class MessageProcessor(AbstractMessageProcessor):
-    @staticmethod
-    def generate_response(response):
-        """
-        Gera uma resposta a partir do texto recebido.
-
-        Este método converte o texto recebido para letras maiúsculas.
-
-        :param response: String contendo o texto da resposta.
-        :return: Texto da resposta em letras maiúsculas.
-        """
-        return response.upper()
