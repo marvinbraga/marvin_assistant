@@ -1,0 +1,7 @@
+version: 2
+authtoken: your_auth_token
+tunnels:
+  customdomain:
+    proto: http
+    addr: 8000
+    hostname: your_ngrok_domain.ngrok-free.app

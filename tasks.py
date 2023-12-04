@@ -1,4 +1,5 @@
 import os
+import sys
 
 from dotenv import load_dotenv, find_dotenv
 from invoke import task
@@ -67,3 +68,19 @@ def prune_all(c):
 def sh(c, svc=""):
     cmd = f'{compose_cmd} exec "{svc}" bash'
     c.run(cmd)
+
+
+@task
+def start_ngrok(c):
+    config_path = os.path.normpath("backend/services/whatsapp_api/.ngrok/ngrok-config.yml")
+
+    if sys.platform.startswith('win'):
+        # Windows
+        ngrok_path = os.path.normpath(os.environ["NGROK_WIN_PATH"])
+        with c.cd(ngrok_path):
+            cmd = f"start cmd /k .\\ngrok.exe start --config={config_path} customdomain"
+            c.run(cmd)
+    elif sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+        # Linux and macOS
+        cmd = f"./ngrok start --config={config_path} customdomain"
+        c.run(cmd, pty=True)
