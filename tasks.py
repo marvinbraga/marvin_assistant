@@ -72,6 +72,9 @@ def sh(c, svc=""):
 
 @task
 def start_ngrok(c):
+    """
+    inv start-ngrok
+    """
     config_path = os.path.normpath(os.environ["NGROK_CONFIG_PATH"])
 
     if sys.platform.startswith('win'):
