@@ -10,6 +10,18 @@
 [![LangChain](https://img.shields.io/badge/LangChain%20Framework-latest-blue.svg)](https://github.com/langchain-ai/langchain)
 [![OpenAI API](https://img.shields.io/badge/OpenAI%20API-0.28.1-orange.svg)](https://beta.openai.com/)
 
+## YouTube Video
+
+Como eu fiz meu assistente virtual de voz que pode usar o WhatsApp?
+
+[https://www.youtube.com/watch?v=1k4ADq0quBI](https://www.youtube.com/watch?v=1k4ADq0quBI)
+
+## Promo
+
+Book 'Python, ChatGPT e Django REST':
+
+[https://s.uiclap.com/13z](https://s.uiclap.com/13z)
+
 ## Description
 
 This project is an interactive voice assistant that allows users to interact through voice commands. The software
